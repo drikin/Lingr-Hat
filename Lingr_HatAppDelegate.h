@@ -12,6 +12,8 @@
 @interface Lingr_HatAppDelegate : NSObject <NSApplicationDelegate> {
     NSWindow *window;
     WebView *mainWebView;
+@private	
+	NSTimer *timer;
 }
 
 @property (assign) IBOutlet NSWindow *window;

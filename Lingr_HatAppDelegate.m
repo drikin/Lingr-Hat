@@ -8,15 +8,20 @@
 
 #import "Lingr_HatAppDelegate.h"
 
+//private member variables
+@interface Lingr_HatAppDelegate ()
+@property (nonatomic, assign)  NSTimer *timer;
+@end
+
+
 @implementation Lingr_HatAppDelegate
+@synthesize window, mainWebView, timer;
 
-@synthesize window, mainWebView;
-
-NSTimer *timer = nil;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
   // Insert code here to initialize your application
     [mainWebView setMainFrameURL:@"http://lingr.com/"];
+	self.timer = nil;
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)aNotification {
@@ -26,12 +31,12 @@ NSTimer *timer = nil;
 
 - (void)applicationDidResignActive:(NSNotification *)aNotification {
     [self cancelTimer];
-    timer = [NSTimer scheduledTimerWithTimeInterval:30.0
+    self.timer = [NSTimer scheduledTimerWithTimeInterval:5.0
                                              target:self
                                            selector:@selector(enableLogging)
                                            userInfo:nil
                                             repeats:NO];
-    [timer retain];
+    [self.timer retain];
 }
 
 - (void)                  webView : (WebView      *) sender
@@ -66,10 +71,10 @@ NSTimer *timer = nil;
 }
 
 - (void)cancelTimer {
-    if (timer != nil) {
-        [timer invalidate];
-        [timer release];
-        timer = nil;
+    if (self.timer != nil) {
+        [self.timer invalidate];
+        [self.timer release];
+        self.timer = nil;
     }
 }
 @end
