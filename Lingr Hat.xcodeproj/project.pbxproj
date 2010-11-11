@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0B4AB725128C3EBC001D63DD /* WindowResetButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B4AB724128C3EBC001D63DD /* WindowResetButton.m */; };
 		0BA87C6B128C29BA00A02AB5 /* Float2StringTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BA87C6A128C29BA00A02AB5 /* Float2StringTransformer.m */; };
 		1DDD58160DA1D0A300B32029 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58140DA1D0A300B32029 /* MainMenu.xib */; };
 		256AC3DA0F4B6AC300CF3369 /* Lingr_HatAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 256AC3D90F4B6AC300CF3369 /* Lingr_HatAppDelegate.m */; };
@@ -31,6 +32,8 @@
 
 /* Begin PBXFileReference section */
 		089C165DFE840E0CC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		0B4AB723128C3EBC001D63DD /* WindowResetButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WindowResetButton.h; sourceTree = "<group>"; };
+		0B4AB724128C3EBC001D63DD /* WindowResetButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WindowResetButton.m; sourceTree = "<group>"; };
 		0BA87C69128C29BA00A02AB5 /* Float2StringTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Float2StringTransformer.h; sourceTree = "<group>"; };
 		0BA87C6A128C29BA00A02AB5 /* Float2StringTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Float2StringTransformer.m; sourceTree = "<group>"; };
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
@@ -76,6 +79,8 @@
 			children = (
 				0BA87C69128C29BA00A02AB5 /* Float2StringTransformer.h */,
 				0BA87C6A128C29BA00A02AB5 /* Float2StringTransformer.m */,
+				0B4AB723128C3EBC001D63DD /* WindowResetButton.h */,
+				0B4AB724128C3EBC001D63DD /* WindowResetButton.m */,
 			);
 			name = helper;
 			sourceTree = "<group>";
@@ -232,6 +237,7 @@
 				8D11072D0486CEB800E47090 /* main.m in Sources */,
 				256AC3DA0F4B6AC300CF3369 /* Lingr_HatAppDelegate.m in Sources */,
 				0BA87C6B128C29BA00A02AB5 /* Float2StringTransformer.m in Sources */,
+				0B4AB725128C3EBC001D63DD /* WindowResetButton.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
