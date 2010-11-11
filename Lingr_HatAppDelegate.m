@@ -6,31 +6,23 @@
 //  Copyright 2010 drikin.com. All rights reserved.
 //
 
-// imports
 #import "Lingr_HatAppDelegate.h"
 
-// private member variables
-@interface Lingr_HatAppDelegate ()
-@property (nonatomic, assign)  NSTimer *timer;
-@end
-
-// defines
 #define LINGR_HAT_LINGR_BASEURL  @"http://lingr.com/"
 
-// constrains
-const int LINGR_HAT_NON_ACTIVE_TIMER_INTERVAL = 15.0;//30sec is too long to check
+const int LINGR_HAT_NON_ACTIVE_TIMER_INTERVAL = 15.0; //30sec is too long to check
 
-
-//**********************
 @implementation Lingr_HatAppDelegate
 
 @synthesize window, mainWebView, timer;
 
+#pragma mark -
+#pragma mark Application lifecycle
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-  // Insert code here to initialize your application
+    // Insert code here to initialize your application
     [mainWebView setMainFrameURL:LINGR_HAT_LINGR_BASEURL];
-	self.timer = nil;
+    self.timer = nil;
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)aNotification {
@@ -48,6 +40,9 @@ const int LINGR_HAT_NON_ACTIVE_TIMER_INTERVAL = 15.0;//30sec is too long to chec
     [self.timer retain];
 }
 
+#pragma mark -
+#pragma mark WebPolicyDelegate
+
 - (void)                  webView : (WebView      *) sender
    decidePolicyForNewWindowAction : (NSDictionary *) info
                           request : (NSURLRequest *) request
@@ -57,6 +52,9 @@ const int LINGR_HAT_NON_ACTIVE_TIMER_INTERVAL = 15.0;//30sec is too long to chec
     [listener ignore];
     [[NSWorkspace sharedWorkspace] openURL:[request URL]];
 }
+
+#pragma mark -
+#pragma mark Methods
 
 - (void)enableLogging {
     NSString *script = @"\

@@ -12,12 +12,14 @@
 @interface Lingr_HatAppDelegate : NSObject <NSApplicationDelegate> {
     NSWindow *window;
     WebView *mainWebView;
-@private	
-	NSTimer *timer;
+@private
+    NSTimer *timer;
 }
 
 @property (assign) IBOutlet NSWindow *window;
 @property (assign) IBOutlet WebView *mainWebView;
+
+@property (nonatomic, assign)  NSTimer *timer;
 
 - (void)enableLogging;
 - (void)disableLogging;
