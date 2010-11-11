@@ -21,8 +21,8 @@
 
 @property (nonatomic, assign)  NSTimer *timer;
 
-+ (void)initUserDefaults;
-- (void)enableLogging;
-- (void)disableLogging;
-- (void)cancelTimer;
++ (void) setupDefaults;
+- (void) enableLogging;
+- (void) disableLogging;
+- (void) cancelTimer;
 @end

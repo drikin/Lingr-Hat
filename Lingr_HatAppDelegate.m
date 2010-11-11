@@ -8,9 +8,9 @@
 
 #import "Lingr_HatAppDelegate.h"
 
-#define LINGR_HAT_LINGR_BASEURL  @"http://lingr.com/"
+#define LH_LINGR_BASEURL  @"http://lingr.com/"
 
-const int LINGR_HAT_NON_ACTIVE_TIMER_INTERVAL = 30.0; // should be modified by pref
+const float LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL = 30.0;
 
 @implementation Lingr_HatAppDelegate
 
@@ -21,10 +21,12 @@ const int LINGR_HAT_NON_ACTIVE_TIMER_INTERVAL = 30.0; // should be modified by p
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
     userDefaultsValuesDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                                               NO, @"bgScroll",
-        nil];
+			/* Default Values Here VALUE,KEY and VALUE MUST BE OBJECT */
+			[NSNumber numberWithBool:NO], @"bgScroll",
+			[NSNumber numberWithFloat:LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL], @"checkLogInterval",
+			/* Default Values Ended */
+			nil];
     [defaults registerDefaults:userDefaultsValuesDict];
-    //[[NSUserDefaultsController sharedUserDefaultsController] setInitialValues:userDefaultsValuesDict];
 }
 
 
@@ -32,11 +34,16 @@ const int LINGR_HAT_NON_ACTIVE_TIMER_INTERVAL = 30.0; // should be modified by p
 #pragma mark Application lifecycle
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+    // Insert code here to initialize your application
+
+	// set UserDefault
     [Lingr_HatAppDelegate setupDefaults];
 
-    // Insert code here to initialize your application
-    [mainWebView setMainFrameURL:LINGR_HAT_LINGR_BASEURL];
-    self.timer = nil;
+	// init member variables
+	self.timer = nil;
+	
+    // set URL
+	[mainWebView setMainFrameURL:LH_LINGR_BASEURL];    
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)aNotification {
@@ -46,7 +53,9 @@ const int LINGR_HAT_NON_ACTIVE_TIMER_INTERVAL = 30.0; // should be modified by p
 
 - (void)applicationDidResignActive:(NSNotification *)aNotification {
     [self cancelTimer];
-    self.timer = [NSTimer scheduledTimerWithTimeInterval:LINGR_HAT_NON_ACTIVE_TIMER_INTERVAL
+	float fIntervalSec = [[NSUserDefaults standardUserDefaults] floatForKey:@"checkLogInterval"];
+	fIntervalSec = fIntervalSec == 0.0 ?  LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL : fIntervalSec;
+	self.timer = [NSTimer scheduledTimerWithTimeInterval:fIntervalSec
                                              target:self
                                            selector:@selector(enableLogging)
                                            userInfo:nil
