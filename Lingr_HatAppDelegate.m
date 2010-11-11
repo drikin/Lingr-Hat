@@ -31,7 +31,7 @@
 
 - (void)applicationDidResignActive:(NSNotification *)aNotification {
     [self cancelTimer];
-    self.timer = [NSTimer scheduledTimerWithTimeInterval:5.0
+    self.timer = [NSTimer scheduledTimerWithTimeInterval:15.0 //30sec is too long to check
                                              target:self
                                            selector:@selector(enableLogging)
                                            userInfo:nil
