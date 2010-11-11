@@ -82,7 +82,6 @@ const int LINGR_HAT_NON_ACTIVE_TIMER_INTERVAL = 30.0; // should be modified by p
     "];
 
     if (![[NSUserDefaults standardUserDefaults] boolForKey:@"bgScroll"]) {
-        NSLog(@"bgScroll off");
         [script appendString:@"lingr.ui.getActiveRoom = function() {};"];
     }
     [[mainWebView windowScriptObject] evaluateWebScript:script];
