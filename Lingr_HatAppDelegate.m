@@ -10,7 +10,7 @@
 
 #define LH_LINGR_BASEURL  @"http://lingr.com/"
 
-const float LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL = 30;
+const float LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL = 30.0;
 
 @implementation Lingr_HatAppDelegate
 
@@ -25,15 +25,19 @@ const float LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL = 30;
     userDefaultsValuesDict = [NSDictionary dictionaryWithObjectsAndKeys:
 			/* Default Values Here VALUE,KEY and VALUE MUST BE OBJECT */
 							  [NSNumber numberWithBool:NO], @"bgScroll",
-							  [NSNumber numberWithInt:LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL], @"checkLogInterval",
+							  [NSNumber numberWithFloat:LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL], @"checkLogInterval",
 							  [NSNumber numberWithInt:800], @"windowWidth",
 							  [NSNumber numberWithInt:700], @"windowHeight",
 			/* Default Values Ended */
 			nil];
 	[defaults registerDefaults:userDefaultsValuesDict];
 
-    // enabling for Reset
-	NSArray *resettableUserDefaultsKeys = [NSArray arrayWithObjects:@"bgScroll",@"checkLogInterval",@"windowWidth",@"windowHeight", nil];
+    // enable for Reset
+	NSArray *resettableUserDefaultsKeys = [NSArray arrayWithObjects:@"bgScroll",
+																	@"checkLogInterval",
+																	@"windowWidth",
+																	@"windowHeight",
+										   nil];
     initialValuesDict=[userDefaultsValuesDict dictionaryWithValuesForKeys:resettableUserDefaultsKeys];    
     [[NSUserDefaultsController sharedUserDefaultsController] setInitialValues:initialValuesDict];
 }
