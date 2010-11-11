@@ -21,9 +21,9 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
+			<integer value="57"/>
 			<integer value="650"/>
 			<integer value="371"/>
-			<integer value="57"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -916,6 +916,11 @@
 				<string key="NSClassName">NSFontManager</string>
 			</object>
 			<object class="NSUserDefaultsController" id="511375634">
+				<object class="NSMutableArray" key="NSDeclaredKeys">
+					<bool key="EncodedWithXMLCoder">YES</bool>
+					<string>windowWidth</string>
+					<string>windowHeight</string>
+				</object>
 				<bool key="NSSharedInstance">YES</bool>
 			</object>
 			<object class="NSWindowTemplate" id="874222935">
@@ -1604,6 +1609,39 @@
 						</object>
 					</object>
 					<int key="connectionID">647</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">contentHeight: values.windowHeight</string>
+						<reference key="source" ref="972006081"/>
+						<reference key="destination" ref="511375634"/>
+						<object class="NSNibBindingConnector" key="connector" id="1042554054">
+							<reference key="NSSource" ref="972006081"/>
+							<reference key="NSDestination" ref="511375634"/>
+							<string key="NSLabel">contentHeight: values.windowHeight</string>
+							<string key="NSBinding">contentHeight</string>
+							<string key="NSKeyPath">values.windowHeight</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">662</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">contentWidth: values.windowWidth</string>
+						<reference key="source" ref="972006081"/>
+						<reference key="destination" ref="511375634"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="972006081"/>
+							<reference key="NSDestination" ref="511375634"/>
+							<string key="NSLabel">contentWidth: values.windowWidth</string>
+							<string key="NSBinding">contentWidth</string>
+							<string key="NSKeyPath">values.windowWidth</string>
+							<reference key="NSPreviousConnector" ref="1042554054"/>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">664</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -2734,7 +2772,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">659</int>
+			<int key="maxID">664</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
