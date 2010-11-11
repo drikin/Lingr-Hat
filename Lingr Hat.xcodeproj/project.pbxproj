@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0B4AB725128C3EBC001D63DD /* WindowResetButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B4AB724128C3EBC001D63DD /* WindowResetButton.m */; };
-		0BA87C6B128C29BA00A02AB5 /* Float2StringTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BA87C6A128C29BA00A02AB5 /* Float2StringTransformer.m */; };
 		1DDD58160DA1D0A300B32029 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58140DA1D0A300B32029 /* MainMenu.xib */; };
 		256AC3DA0F4B6AC300CF3369 /* Lingr_HatAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 256AC3D90F4B6AC300CF3369 /* Lingr_HatAppDelegate.m */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
@@ -32,10 +30,6 @@
 
 /* Begin PBXFileReference section */
 		089C165DFE840E0CC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		0B4AB723128C3EBC001D63DD /* WindowResetButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WindowResetButton.h; sourceTree = "<group>"; };
-		0B4AB724128C3EBC001D63DD /* WindowResetButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WindowResetButton.m; sourceTree = "<group>"; };
-		0BA87C69128C29BA00A02AB5 /* Float2StringTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Float2StringTransformer.h; sourceTree = "<group>"; };
-		0BA87C6A128C29BA00A02AB5 /* Float2StringTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Float2StringTransformer.m; sourceTree = "<group>"; };
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		1DDD58150DA1D0A300B32029 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
@@ -67,22 +61,10 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				0BA87C75128C2B7F00A02AB5 /* helper */,
 				256AC3D80F4B6AC300CF3369 /* Lingr_HatAppDelegate.h */,
 				256AC3D90F4B6AC300CF3369 /* Lingr_HatAppDelegate.m */,
 			);
 			name = Classes;
-			sourceTree = "<group>";
-		};
-		0BA87C75128C2B7F00A02AB5 /* helper */ = {
-			isa = PBXGroup;
-			children = (
-				0BA87C69128C29BA00A02AB5 /* Float2StringTransformer.h */,
-				0BA87C6A128C29BA00A02AB5 /* Float2StringTransformer.m */,
-				0B4AB723128C3EBC001D63DD /* WindowResetButton.h */,
-				0B4AB724128C3EBC001D63DD /* WindowResetButton.m */,
-			);
-			name = helper;
 			sourceTree = "<group>";
 		};
 		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
@@ -236,8 +218,6 @@
 			files = (
 				8D11072D0486CEB800E47090 /* main.m in Sources */,
 				256AC3DA0F4B6AC300CF3369 /* Lingr_HatAppDelegate.m in Sources */,
-				0BA87C6B128C29BA00A02AB5 /* Float2StringTransformer.m in Sources */,
-				0B4AB725128C3EBC001D63DD /* WindowResetButton.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -275,7 +255,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Lingr_Hat_Prefix.pch;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = "";
 				INFOPLIST_FILE = "Lingr_Hat-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				PRODUCT_NAME = "Lingr Hat";

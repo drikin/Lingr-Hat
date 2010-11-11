@@ -22,7 +22,7 @@ const float LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL = 30.0;
 
     userDefaultsValuesDict = [NSDictionary dictionaryWithObjectsAndKeys:
 			/* Default Values Here VALUE,KEY and VALUE MUST BE OBJECT */
-							  [NSNumber numberWithBool:NO], @"bgScroll",
+							  [NSNumber numberWithBool:YES], @"bgScroll",
 							  [NSNumber numberWithFloat:LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL], @"checkLogInterval",
 							  [NSNumber numberWithInt:800], @"windowWidth",
 							  [NSNumber numberWithInt:700], @"windowHeight",
