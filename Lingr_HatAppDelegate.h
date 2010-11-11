@@ -10,10 +10,10 @@
 #import <WebKit/WebKit.h>
 
 @interface Lingr_HatAppDelegate : NSObject <NSApplicationDelegate> {
-    NSWindow *window;
-    WebView *mainWebView;
+    NSWindow		*window;
+    WebView		*mainWebView;
 @private
-    NSTimer *timer;
+    NSTimer		*timer;
 }
 
 @property (assign) IBOutlet NSWindow *window;
