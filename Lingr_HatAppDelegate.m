@@ -10,16 +10,30 @@
 
 #define LINGR_HAT_LINGR_BASEURL  @"http://lingr.com/"
 
-const int LINGR_HAT_NON_ACTIVE_TIMER_INTERVAL = 15.0; //30sec is too long to check
+const int LINGR_HAT_NON_ACTIVE_TIMER_INTERVAL = 30.0; // should be modified by pref
 
 @implementation Lingr_HatAppDelegate
 
 @synthesize window, mainWebView, timer;
 
++ (void)setupDefaults {
+    NSDictionary   *userDefaultsValuesDict;
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+
+    userDefaultsValuesDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                                               NO, @"bgScroll",
+        nil];
+    [defaults registerDefaults:userDefaultsValuesDict];
+    //[[NSUserDefaultsController sharedUserDefaultsController] setInitialValues:userDefaultsValuesDict];
+}
+
+
 #pragma mark -
 #pragma mark Application lifecycle
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+    [Lingr_HatAppDelegate setupDefaults];
+
     // Insert code here to initialize your application
     [mainWebView setMainFrameURL:LINGR_HAT_LINGR_BASEURL];
     self.timer = nil;
@@ -57,7 +71,7 @@ const int LINGR_HAT_NON_ACTIVE_TIMER_INTERVAL = 15.0; //30sec is too long to che
 #pragma mark Methods
 
 - (void)enableLogging {
-    NSString *script = @"\
+    NSMutableString *script = [NSMutableString stringWithString:@"\
         var d = document.getElementsByClassName('decorated'); \
         for (var i = 0; i < d.length; i++) { \
             var p = d[i].getElementsByTagName('p'); \
@@ -65,16 +79,22 @@ const int LINGR_HAT_NON_ACTIVE_TIMER_INTERVAL = 15.0; //30sec is too long to che
                 p[j].style.color = 'DarkGray'; \
             } \
         } \
-        lingr.ui.getActiveRoom = function() {}; \
-    ";
+    "];
+
+    if (![[NSUserDefaults standardUserDefaults] boolForKey:@"bgScroll"]) {
+        NSLog(@"bgScroll off");
+        [script appendString:@"lingr.ui.getActiveRoom = function() {};"];
+    }
     [[mainWebView windowScriptObject] evaluateWebScript:script];
 }
 
 - (void)disableLogging {
-    NSString *script = @"\
-    lingr.ui.getActiveRoom = function() {return extractId($$('#left .active')[0]);}; \
-    ";
-    [[mainWebView windowScriptObject] evaluateWebScript:script];
+    if (![[NSUserDefaults standardUserDefaults] boolForKey:@"bgScroll"]) {
+        NSString *script = @"\
+                           lingr.ui.getActiveRoom = function() {return extractId($$('#left .active')[0]);}; \
+                           ";
+        [[mainWebView windowScriptObject] evaluateWebScript:script];
+    }
 }
 
 - (void)cancelTimer {
