@@ -6,21 +6,30 @@
 //  Copyright 2010 drikin.com. All rights reserved.
 //
 
+// imports
 #import "Lingr_HatAppDelegate.h"
 
-//private member variables
+// private member variables
 @interface Lingr_HatAppDelegate ()
 @property (nonatomic, assign)  NSTimer *timer;
 @end
 
+// defines
+#define LINGR_HAT_LINGR_BASEURL  @"http://lingr.com/"
 
+// constrains
+const int LINGR_HAT_NON_ACTIVE_TIMER_INTERVAL = 15.0;//30sec is too long to check
+
+
+//**********************
 @implementation Lingr_HatAppDelegate
+
 @synthesize window, mainWebView, timer;
 
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
   // Insert code here to initialize your application
-    [mainWebView setMainFrameURL:@"http://lingr.com/"];
+    [mainWebView setMainFrameURL:LINGR_HAT_LINGR_BASEURL];
 	self.timer = nil;
 }
 
@@ -31,7 +40,7 @@
 
 - (void)applicationDidResignActive:(NSNotification *)aNotification {
     [self cancelTimer];
-    self.timer = [NSTimer scheduledTimerWithTimeInterval:15.0 //30sec is too long to check
+    self.timer = [NSTimer scheduledTimerWithTimeInterval:LINGR_HAT_NON_ACTIVE_TIMER_INTERVAL
                                              target:self
                                            selector:@selector(enableLogging)
                                            userInfo:nil
@@ -77,4 +86,5 @@
         self.timer = nil;
     }
 }
+
 @end
