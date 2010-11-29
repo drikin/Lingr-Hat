@@ -69,7 +69,6 @@ const float LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL = 30.0;
 
     // Hide Notification Badge
     NSDockTile *dockTile = [NSApp dockTile];
-    [dockTile setShowsApplicationBadge:YES];
     [dockTile setBadgeLabel:nil];
 }
 
@@ -154,7 +153,6 @@ const float LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL = 30.0;
             NSDockTile *dockTile = [NSApp dockTile];
             
             // Show Notification Badge
-            [dockTile setShowsApplicationBadge:YES];
             if (currentNumOfUnreadMessage > 0) {
                 [dockTile setBadgeLabel:[NSString stringWithFormat:@"%d",currentNumOfUnreadMessage]];
                 if (numOfUnreadMessage != currentNumOfUnreadMessage) {
