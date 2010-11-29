@@ -14,6 +14,9 @@
     WebView		*mainWebView;
 @private
     NSTimer		*timer;
+    int         numOfMessage;
+    int         numOfUnreadMessage;
+    BOOL        bEvaluatedOnDeactive;
 }
 
 @property (assign) IBOutlet NSWindow *window;

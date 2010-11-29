@@ -49,6 +49,10 @@ const float LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL = 30.0;
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // Insert code here to initialize your application
 
+    // initialize member variables
+    numOfMessage = 0;
+    numOfUnreadMessage = 0;
+    
 	// set UserDefault
     [Lingr_HatAppDelegate setupDefaults];
 
@@ -56,23 +60,30 @@ const float LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL = 30.0;
 	self.timer = nil;
 	
     // set URL
-	[mainWebView setMainFrameURL:LH_LINGR_BASEURL];    
+	[mainWebView setMainFrameURL:LH_LINGR_BASEURL]; 
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)aNotification {
     [self cancelTimer];
     [self disableLogging];
+
+    // Hide Notification Badge
+    NSDockTile *dockTile = [NSApp dockTile];
+    [dockTile setShowsApplicationBadge:YES];
+    [dockTile setBadgeLabel:nil];
 }
 
 - (void)applicationDidResignActive:(NSNotification *)aNotification {
     [self cancelTimer];
-	float fIntervalSec = [[NSUserDefaults standardUserDefaults] floatForKey:@"checkLogInterval"];
+
+    bEvaluatedOnDeactive = NO;	
+    float fIntervalSec = [[NSUserDefaults standardUserDefaults] floatForKey:@"checkLogInterval"];
 	fIntervalSec = fIntervalSec == 0.0 ?  LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL : fIntervalSec;
 	self.timer = [NSTimer scheduledTimerWithTimeInterval:fIntervalSec
                                              target:self
                                            selector:@selector(enableLogging)
                                            userInfo:nil
-                                            repeats:NO];
+                                            repeats:YES];
     [self.timer retain];
 }
 
@@ -93,20 +104,69 @@ const float LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL = 30.0;
 #pragma mark Methods
 
 - (void)enableLogging {
-    NSMutableString *script = [NSMutableString stringWithString:@"\
-        var d = document.getElementsByClassName('decorated'); \
-        for (var i = 0; i < d.length; i++) { \
-            var p = d[i].getElementsByTagName('p'); \
-            for (var j = 0; j < p.length; j++) { \
-                p[j].style.color = 'DarkGray'; \
+    if (!bEvaluatedOnDeactive) {
+        NSMutableString *script = [NSMutableString stringWithString:@"\
+            var numOfElements = 0;\
+            var d = document.getElementsByClassName('decorated'); \
+            for (var i = 0; i < d.length; i++) { \
+                var p = d[i].getElementsByTagName('p'); \
+                for (var j = 0; j < p.length; j++) { \
+                    p[j].style.color = 'DarkGray'; \
+                    numOfElements += 1; \
+                } \
             } \
-        } \
-    "];
+        "];
 
-    if (![[NSUserDefaults standardUserDefaults] boolForKey:@"bgScroll"]) {
-        [script appendString:@"lingr.ui.getActiveRoom = function() {};"];
-    }
-    [[mainWebView windowScriptObject] evaluateWebScript:script];
+        if (![[NSUserDefaults standardUserDefaults] boolForKey:@"bgScroll"]) {
+            [script appendString:@"lingr.ui.getActiveRoom = function() {};"];
+        }
+        [script appendString:@"numOfElements"];
+
+        id result = [[mainWebView windowScriptObject] evaluateWebScript:script];
+        if ([result isMemberOfClass:[WebUndefined class]]) {
+            //error
+            return;
+        } else {
+            //NSLog([result stringValue]);
+            numOfMessage = [result intValue];
+        }
+        bEvaluatedOnDeactive = YES;
+    } else {
+        NSMutableString *script = [NSMutableString stringWithString:@"\
+                                   var numOfElements = 0;\
+                                   var d = document.getElementsByClassName('decorated'); \
+                                   for (var i = 0; i < d.length; i++) { \
+                                   var p = d[i].getElementsByTagName('p'); \
+                                   for (var j = 0; j < p.length; j++) { \
+                                   numOfElements += 1; \
+                                   } \
+                                   } \
+                                   "];
+        
+        [script appendString:@"numOfElements"];
+        id result = [[mainWebView windowScriptObject] evaluateWebScript:script];
+        if ([result isMemberOfClass:[WebUndefined class]]) {
+            //error
+        } else {
+            int currentNumOfUnreadMessage = [result intValue] - numOfMessage;
+            NSLog(@"Num of Unread Messages: %d", currentNumOfUnreadMessage);
+
+            NSDockTile *dockTile = [NSApp dockTile];
+            
+            // Show Notification Badge
+            [dockTile setShowsApplicationBadge:YES];
+            if (currentNumOfUnreadMessage > 0) {
+                [dockTile setBadgeLabel:[NSString stringWithFormat:@"%d",currentNumOfUnreadMessage]];
+                if (numOfUnreadMessage != currentNumOfUnreadMessage) {
+                    //Dock Bounce
+                    [NSApp requestUserAttention:NSInformationalRequest];
+                }                
+                numOfUnreadMessage = currentNumOfUnreadMessage;
+            } else {
+                [dockTile setBadgeLabel:nil];
+            }
+        }
+    }    
 }
 
 - (void)disableLogging {
