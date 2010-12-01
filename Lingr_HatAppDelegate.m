@@ -147,8 +147,8 @@ const float LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL = 30.0;
     }
 
     // injection for counting unread messages
-    static BOOL bFlag =  NO;
-    if (bFlag == NO) {
+    static BOOL bInjected =  NO;
+    if (bInjected == NO) {
         NSString *script = @"\
         var numOfUnreadMessage = 0;\
         lingr.ui.insertMessageFunc = lingr.ui.insertMessage;\
@@ -162,21 +162,21 @@ const float LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL = 30.0;
             NSLog(@"Injection Error occurs");
         } else {
             NSLog(@"Success injection ");
-            bFlag = YES; // once for all
+            bInjected = YES; // once for all
         }        
     }
     
     // check and show counted number of unread messages
     if ([NSApp isActive] == NO) {
         int unreadmessage = [self countUnreadMessagesFromScript];
-        NSDockTile *dockTile = [NSApp dockTile];
-        if (unreadmessage != 0) {
+        if (unreadmessage > 0) {
+            NSDockTile *dockTile = [NSApp dockTile];
             [dockTile setBadgeLabel:[NSString stringWithFormat:@"%d", unreadmessage]];
+            if (unreadmessage != numOfUnreadMessages) {
+                [NSApp requestUserAttention:NSInformationalRequest];
+            }
         }
-        if (unreadmessage != numOfUnreadMessages) {
-            [NSApp requestUserAttention:NSInformationalRequest];
-        }
-        numOfUnreadMessages = unreadmessage;
+        numOfUnreadMessages = unreadmessage < 0 ? 0 : unreadmessage ;
     }
 }
 
