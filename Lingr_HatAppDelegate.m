@@ -14,7 +14,7 @@ const float LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL = 30.0;
 
 @implementation Lingr_HatAppDelegate
 
-@synthesize window, mainWebView, timer;
+@synthesize window, mainWebView, singleShotTimer, unreadCheckTimer;
 
 + (void)setupDefaults {
     NSDictionary   *userDefaultsValuesDict;
@@ -50,41 +50,68 @@ const float LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL = 30.0;
     // Insert code here to initialize your application
 
     // initialize member variables
-    numOfMessage = 0;
-    numOfUnreadMessage = 0;
+    numOfUnreadMessages = 0;
+    bEnableCheking = NO;
     
 	// set UserDefault
     [Lingr_HatAppDelegate setupDefaults];
 
 	// init member variables
-	self.timer = nil;
+	self.singleShotTimer = nil;
 	
     // set URL
-	[mainWebView setMainFrameURL:LH_LINGR_BASEURL]; 
+	[mainWebView setMainFrameURL:LH_LINGR_BASEURL];
+
+    self.unreadCheckTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 
+                                                             target:self 
+                                                           selector:@selector(periodicInvoker) 
+                                                           userInfo:nil repeats:YES];
+}
+
+- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
+{
+    if (self.unreadCheckTimer != nil) {
+        [self.unreadCheckTimer invalidate];
+        [self.unreadCheckTimer release];
+        self.unreadCheckTimer = nil;
+    }
+    return NSTerminateNow;
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)aNotification {
-    [self cancelTimer];
+	[self cancelSingleshotTimer];
     [self disableLogging];
 
+	// Reset unread and disable UnreadChecking
+    bEnableCheking = NO;
+	
     // Hide Notification Badge
     NSDockTile *dockTile = [NSApp dockTile];
     [dockTile setBadgeLabel:nil];
+
+
+    NSString *script = @"numOfUnreadMessage = 0;";
+    [[mainWebView windowScriptObject] evaluateWebScript:script];
 }
 
-- (void)applicationDidResignActive:(NSNotification *)aNotification {
-    [self cancelTimer];
 
-    bEvaluatedOnDeactive = NO;	
-    float fIntervalSec = [[NSUserDefaults standardUserDefaults] floatForKey:@"checkLogInterval"];
+- (void)applicationDidResignActive:(NSNotification *)aNotification {
+
+    
+    [self cancelSingleshotTimer];
+
+    // invoke oneshot timer
+	float fIntervalSec = [[NSUserDefaults standardUserDefaults] floatForKey:@"checkLogInterval"];
 	fIntervalSec = fIntervalSec == 0.0 ?  LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL : fIntervalSec;
-	self.timer = [NSTimer scheduledTimerWithTimeInterval:fIntervalSec
+	self.singleShotTimer = [NSTimer scheduledTimerWithTimeInterval:fIntervalSec
                                              target:self
                                            selector:@selector(enableLogging)
                                            userInfo:nil
-                                            repeats:YES];
-    [self.timer retain];
+                                            repeats:NO];
+    [self.singleShotTimer retain];
 }
+
+
 
 #pragma mark -
 #pragma mark WebPolicyDelegate
@@ -99,88 +126,116 @@ const float LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL = 30.0;
     [[NSWorkspace sharedWorkspace] openURL:[request URL]];
 }
 
+
+-(int) countUnreadMessagesFromScript
+{
+    NSString *script = @"numOfUnreadMessage";
+    id result = [[mainWebView windowScriptObject] evaluateWebScript:script];
+    if ([result isMemberOfClass:[WebUndefined class]]) {
+        return -1;
+    } else {
+        return [result intValue];
+    }
+}
+
+
+-(void)periodicInvoker
+{
+    // 
+    if (bEnableCheking == NO) {
+        return;
+    }
+
+    // injection for counting unread messages
+    static BOOL bFlag =  NO;
+    if (bFlag == NO) {
+        NSString *script = @"\
+        var numOfUnreadMessage = 0;\
+        lingr.ui.insertMessageFunc = lingr.ui.insertMessage;\
+        lingr.ui.insertMessage = function(a,b) {\
+            numOfUnreadMessage += 1;\
+            return this.insertMessageFunc(a,b);\
+        };\
+        ";
+        id result = [[mainWebView windowScriptObject] evaluateWebScript:script];
+        if ([result isMemberOfClass:[WebUndefined class]]) {
+            NSLog(@"Injection Error occurs");
+        } else {
+            NSLog(@"Success injection ");
+            bFlag = YES; // once for all
+        }        
+    }
+    
+    // check and show counted number of unread messages
+    if ([NSApp isActive] == NO) {
+        int unreadmessage = [self countUnreadMessagesFromScript];
+        NSDockTile *dockTile = [NSApp dockTile];
+        if (unreadmessage != 0) {
+            [dockTile setBadgeLabel:[NSString stringWithFormat:@"%d", unreadmessage]];
+        }
+        if (unreadmessage != numOfUnreadMessages) {
+            [NSApp requestUserAttention:NSInformationalRequest];
+        }
+        numOfUnreadMessages = unreadmessage;
+    }
+}
+
+
+
 #pragma mark -
 #pragma mark Methods
 
-- (void)enableLogging {
-    if (!bEvaluatedOnDeactive) {
-        NSMutableString *script = [NSMutableString stringWithString:@"\
-            var numOfElements = 0;\
-            var d = document.getElementsByClassName('decorated'); \
-            for (var i = 0; i < d.length; i++) { \
-                var p = d[i].getElementsByTagName('p'); \
-                for (var j = 0; j < p.length; j++) { \
-                    p[j].style.color = 'DarkGray'; \
-                    numOfElements += 1; \
-                } \
-            } \
-        "];
+- (void)enableLogging 
+{
+	// change message color to gray
+    NSMutableString *script = [NSMutableString stringWithString:@"\
+		var d = document.getElementsByClassName('decorated'); \
+		for (var i = 0; i < d.length; i++) { \
+			var p = d[i].getElementsByTagName('p'); \
+			for (var j = 0; j < p.length; j++) { \
+				p[j].style.color = 'DarkGray'; \
+			} \
+		} \
+	"];
 
-        if (![[NSUserDefaults standardUserDefaults] boolForKey:@"bgScroll"]) {
-            [script appendString:@"lingr.ui.getActiveRoom = function() {};"];
-        }
-        [script appendString:@"numOfElements"];
+    // bgScroll
+	if (![[NSUserDefaults standardUserDefaults] boolForKey:@"bgScroll"]) {
+		[script appendString:@"lingr.ui.getActiveRoom = function() {};"];
+	}
+    
+    // reset variables for counting unread message
+    [script appendString:@"numOfUnreadMessage = 0;"];
+     
+    // evaluate javascript
+	[[mainWebView windowScriptObject] evaluateWebScript:script];
 
-        id result = [[mainWebView windowScriptObject] evaluateWebScript:script];
-        if ([result isMemberOfClass:[WebUndefined class]]) {
-            //error
-            return;
-        } else {
-            //NSLog([result stringValue]);
-            numOfMessage = [result intValue];
-        }
-        bEvaluatedOnDeactive = YES;
-    } else {
-        NSMutableString *script = [NSMutableString stringWithString:@"\
-                                   var numOfElements = 0;\
-                                   var d = document.getElementsByClassName('decorated'); \
-                                   for (var i = 0; i < d.length; i++) { \
-                                   var p = d[i].getElementsByTagName('p'); \
-                                   for (var j = 0; j < p.length; j++) { \
-                                   numOfElements += 1; \
-                                   } \
-                                   } \
-                                   "];
-        
-        [script appendString:@"numOfElements"];
-        id result = [[mainWebView windowScriptObject] evaluateWebScript:script];
-        if ([result isMemberOfClass:[WebUndefined class]]) {
-            //error
-        } else {
-            int currentNumOfUnreadMessage = [result intValue] - numOfMessage;
-            NSLog(@"Num of Unread Messages: %d", currentNumOfUnreadMessage);
-
-            NSDockTile *dockTile = [NSApp dockTile];
-            
-            // Show Notification Badge
-            if (currentNumOfUnreadMessage > 0) {
-                [dockTile setBadgeLabel:[NSString stringWithFormat:@"%d",currentNumOfUnreadMessage]];
-                if (numOfUnreadMessage != currentNumOfUnreadMessage) {
-                    //Dock Bounce
-                    [NSApp requestUserAttention:NSInformationalRequest];
-                }                
-                numOfUnreadMessage = currentNumOfUnreadMessage;
-            } else {
-                [dockTile setBadgeLabel:nil];
-            }
-        }
-    }    
+    // enable to count unread messages
+    bEnableCheking = YES;
 }
 
-- (void)disableLogging {
+
+- (void)disableLogging
+{
+    // bgScroll
     if (![[NSUserDefaults standardUserDefaults] boolForKey:@"bgScroll"]) {
         NSString *script = @"\
                            lingr.ui.getActiveRoom = function() {return extractId($$('#left .active')[0]);}; \
                            ";
         [[mainWebView windowScriptObject] evaluateWebScript:script];
     }
+
+    // disable to count unread messages
+    bEnableCheking = NO;
 }
 
-- (void)cancelTimer {
-    if (self.timer != nil) {
-        [self.timer invalidate];
-        [self.timer release];
-        self.timer = nil;
+
+- (void)cancelSingleshotTimer 
+{
+    // cancel timer which has not invoked
+    if (self.singleShotTimer != nil) {
+        [self.singleShotTimer invalidate];
+        [self.singleShotTimer release];
+        self.singleShotTimer = nil;
     }
 }
 

@@ -13,19 +13,21 @@
     NSWindow		*window;
     WebView		*mainWebView;
 @private
-    NSTimer		*timer;
-    int         numOfMessage;
-    int         numOfUnreadMessage;
-    BOOL        bEvaluatedOnDeactive;
+    NSTimer		*singleShotTimer;
+    NSTimer		*unreadCheckTimer;
+    BOOL        bEnableCheking;
+    int         numOfUnreadMessages;
 }
 
 @property (assign) IBOutlet NSWindow *window;
 @property (assign) IBOutlet WebView *mainWebView;
 
-@property (nonatomic, assign)  NSTimer *timer;
+@property (nonatomic, assign)  NSTimer *singleShotTimer;
+@property (nonatomic, assign)  NSTimer *unreadCheckTimer;
 
 + (void) setupDefaults;
 - (void) enableLogging;
 - (void) disableLogging;
-- (void) cancelTimer;
+- (void) cancelSingleshotTimer;
+
 @end
