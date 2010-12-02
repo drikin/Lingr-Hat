@@ -8,13 +8,18 @@
 
 #import "Lingr_HatAppDelegate.h"
 
-#define LH_LINGR_BASEURL  @"http://lingr.com/"
+#pragma mark -
+#pragma mark Application Definitions
 
+#define LH_LINGR_BASEURL  @"http://lingr.com/"
 const float LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL = 30.0;
 
-@implementation Lingr_HatAppDelegate
 
-@synthesize window, mainWebView, singleShotTimer, unreadCheckTimer;
+@implementation Lingr_HatAppDelegate
+@synthesize window, mainWebView, singleShotTimer;
+
+#pragma mark -
+#pragma mark Registry Settings
 
 + (void)setupDefaults {
     NSDictionary   *userDefaultsValuesDict;
@@ -43,6 +48,7 @@ const float LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL = 30.0;
 }
 
 
+
 #pragma mark -
 #pragma mark Application lifecycle
 
@@ -61,22 +67,8 @@ const float LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL = 30.0;
 	
     // set URL
 	[mainWebView setMainFrameURL:LH_LINGR_BASEURL];
-
-    self.unreadCheckTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 
-                                                             target:self 
-                                                           selector:@selector(periodicInvoker) 
-                                                           userInfo:nil repeats:YES];
 }
 
-- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
-{
-    if (self.unreadCheckTimer != nil) {
-        [self.unreadCheckTimer invalidate];
-        [self.unreadCheckTimer release];
-        self.unreadCheckTimer = nil;
-    }
-    return NSTerminateNow;
-}
 
 - (void)applicationDidBecomeActive:(NSNotification *)aNotification {
 	[self cancelSingleshotTimer];
@@ -88,17 +80,11 @@ const float LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL = 30.0;
     // Hide Notification Badge
     NSDockTile *dockTile = [NSApp dockTile];
     [dockTile setBadgeLabel:nil];
-
-
-    NSString *script = @"numOfUnreadMessage = 0;";
-    [[mainWebView windowScriptObject] evaluateWebScript:script];
 }
 
 
 - (void)applicationDidResignActive:(NSNotification *)aNotification {
-
-    
-    [self cancelSingleshotTimer];
+	[self cancelSingleshotTimer];
 
     // invoke oneshot timer
 	float fIntervalSec = [[NSUserDefaults standardUserDefaults] floatForKey:@"checkLogInterval"];
@@ -109,6 +95,7 @@ const float LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL = 30.0;
                                            userInfo:nil
                                             repeats:NO];
     [self.singleShotTimer retain];
+	[self tryToInsertInjectionCode]; //but Inject is only once 
 }
 
 
@@ -127,60 +114,19 @@ const float LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL = 30.0;
 }
 
 
--(int) countUnreadMessagesFromScript
+
+- (void)				webView:(WebView *)webView 
+decidePolicyForNavigationAction:(NSDictionary *)actionInformation
+						request:(NSURLRequest *)request
+						  frame:(WebFrame *)frame
+			   decisionListener:(id<WebPolicyDecisionListener>)listener
 {
-    NSString *script = @"numOfUnreadMessage";
-    id result = [[mainWebView windowScriptObject] evaluateWebScript:script];
-    if ([result isMemberOfClass:[WebUndefined class]]) {
-        return -1;
-    } else {
-        return [result intValue];
-    }
+	NSURL *url = [request URL];
+	if( [[url scheme] isEqualToString:@"lingr"] ) {
+		[self incommingMessages];
+	} 
+	[listener use];
 }
-
-
--(void)periodicInvoker
-{
-    // 
-    if (bEnableCheking == NO) {
-        return;
-    }
-
-    // injection for counting unread messages
-    static BOOL bInjected =  NO;
-    if (bInjected == NO) {
-        NSString *script = @"\
-        var numOfUnreadMessage = 0;\
-        lingr.ui.insertMessageFunc = lingr.ui.insertMessage;\
-        lingr.ui.insertMessage = function(a,b) {\
-            numOfUnreadMessage += 1;\
-            return this.insertMessageFunc(a,b);\
-        };\
-        ";
-        id result = [[mainWebView windowScriptObject] evaluateWebScript:script];
-        if ([result isMemberOfClass:[WebUndefined class]]) {
-            NSLog(@"Injection Error occurs");
-        } else {
-            NSLog(@"Success injection ");
-            bInjected = YES; // once for all
-        }        
-    }
-    
-    // check and show counted number of unread messages
-    if ([NSApp isActive] == NO) {
-        int unreadmessage = [self countUnreadMessagesFromScript];
-        if (unreadmessage > 0) {
-            NSDockTile *dockTile = [NSApp dockTile];
-            [dockTile setBadgeLabel:[NSString stringWithFormat:@"%d", unreadmessage]];
-            if (unreadmessage != numOfUnreadMessages) {
-                [NSApp requestUserAttention:NSInformationalRequest];
-            }
-        }
-        numOfUnreadMessages = unreadmessage < 0 ? 0 : unreadmessage ;
-    }
-}
-
-
 
 #pragma mark -
 #pragma mark Methods
@@ -202,17 +148,14 @@ const float LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL = 30.0;
 	if (![[NSUserDefaults standardUserDefaults] boolForKey:@"bgScroll"]) {
 		[script appendString:@"lingr.ui.getActiveRoom = function() {};"];
 	}
-    
-    // reset variables for counting unread message
-    [script appendString:@"numOfUnreadMessage = 0;"];
      
     // evaluate javascript
 	[[mainWebView windowScriptObject] evaluateWebScript:script];
-
-    // enable to count unread messages
-    bEnableCheking = YES;
+	
+	// enable counting unread messages
+	numOfUnreadMessages = 0;
+	bEnableCheking = YES;
 }
-
 
 - (void)disableLogging
 {
@@ -224,10 +167,34 @@ const float LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL = 30.0;
         [[mainWebView windowScriptObject] evaluateWebScript:script];
     }
 
-    // disable to count unread messages
-    bEnableCheking = NO;
+	// disable counting unread messages	
+	bEnableCheking = NO;
 }
 
+
+-(void)tryToInsertInjectionCode
+{
+    // injection for counting unread messages
+	// once for all
+    static BOOL bInjected =  NO;
+    if (bInjected == NO) {
+        NSString *script = @"\
+        lingr.ui.insertMessageFunc = lingr.ui.insertMessage;\
+        lingr.ui.insertMessage = function(a,b) {\
+			var result = this.insertMessageFunc(a,b);\
+			document.location.href = 'lingr://insertMessage/';\
+			return result;\
+        };\
+        ";
+        id result = [[mainWebView windowScriptObject] evaluateWebScript:script];
+        if ([result isMemberOfClass:[WebUndefined class]]) {
+            NSLog(@"Injection Error occurs");
+        } else {
+            NSLog(@"Success injection ");
+            bInjected = YES; 
+        }        
+    }
+}
 
 - (void)cancelSingleshotTimer 
 {
@@ -237,6 +204,23 @@ const float LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL = 30.0;
         [self.singleShotTimer release];
         self.singleShotTimer = nil;
     }
+}
+
+
+
+#pragma mark -
+#pragma mark Event Actions
+
+-(void)incommingMessages
+{
+	if ([NSApp isActive] || (!bEnableCheking)) {
+		return;
+	}
+	
+	numOfUnreadMessages += 1;
+	NSDockTile *dockTile = [NSApp dockTile];
+	[dockTile setBadgeLabel:[NSString stringWithFormat:@"%d", numOfUnreadMessages]];
+	[NSApp requestUserAttention:NSInformationalRequest];
 }
 
 @end

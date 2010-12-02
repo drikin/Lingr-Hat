@@ -14,7 +14,6 @@
     WebView		*mainWebView;
 @private
     NSTimer		*singleShotTimer;
-    NSTimer		*unreadCheckTimer;
     BOOL        bEnableCheking;
     int         numOfUnreadMessages;
 }
@@ -23,11 +22,13 @@
 @property (assign) IBOutlet WebView *mainWebView;
 
 @property (nonatomic, assign)  NSTimer *singleShotTimer;
-@property (nonatomic, assign)  NSTimer *unreadCheckTimer;
 
 + (void) setupDefaults;
 - (void) enableLogging;
 - (void) disableLogging;
 - (void) cancelSingleshotTimer;
+
+- (void) tryToInsertInjectionCode;
+- (void) incommingMessages;
 
 @end
