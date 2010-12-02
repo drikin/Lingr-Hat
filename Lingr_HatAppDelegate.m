@@ -24,26 +24,26 @@ const float LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL = 30.0;
 + (void)setupDefaults {
     NSDictionary   *userDefaultsValuesDict;
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-	NSDictionary *initialValuesDict;
-	
-	// set UserDefaults Default
+    NSDictionary *initialValuesDict;
+    
+    // set UserDefaults Default
     userDefaultsValuesDict = [NSDictionary dictionaryWithObjectsAndKeys:
-			/* Default Values Here VALUE,KEY and VALUE MUST BE OBJECT */
-							  [NSNumber numberWithBool:NO], @"bgScroll",
-							  [NSNumber numberWithFloat:LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL], @"checkLogInterval",
-							  [NSNumber numberWithInt:800], @"windowWidth",
-							  [NSNumber numberWithInt:700], @"windowHeight",
-			/* Default Values Ended */
-			nil];
-	[defaults registerDefaults:userDefaultsValuesDict];
+                    /* Default Values Here VALUE,KEY and VALUE MUST BE OBJECT */
+                    [NSNumber numberWithBool:NO], @"bgScroll",
+                    [NSNumber numberWithFloat:LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL], @"checkLogInterval",
+                    [NSNumber numberWithInt:800], @"windowWidth",
+                    [NSNumber numberWithInt:700], @"windowHeight",
+                    /* Default Values Ended */
+            nil];
+    [defaults registerDefaults:userDefaultsValuesDict];
 
     // enable for Reset
-	NSArray *resettableUserDefaultsKeys = [NSArray arrayWithObjects:@"bgScroll",
-																	@"checkLogInterval",
-																	@"windowWidth",
-																	@"windowHeight",
-										   nil];
-    initialValuesDict=[userDefaultsValuesDict dictionaryWithValuesForKeys:resettableUserDefaultsKeys];    
+    NSArray *resettableUserDefaultsKeys = [NSArray arrayWithObjects:@"bgScroll",
+                                                                    @"checkLogInterval",
+                                                                    @"windowWidth",
+                                                                    @"windowHeight",
+                                           nil];
+    initialValuesDict=[userDefaultsValuesDict dictionaryWithValuesForKeys:resettableUserDefaultsKeys];
     [[NSUserDefaultsController sharedUserDefaultsController] setInitialValues:initialValuesDict];
 }
 
@@ -58,25 +58,25 @@ const float LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL = 30.0;
     // initialize member variables
     numOfUnreadMessages = 0;
     bEnableCheking = NO;
-    
-	// set UserDefault
+
+    // set UserDefault
     [Lingr_HatAppDelegate setupDefaults];
 
-	// init member variables
-	self.singleShotTimer = nil;
-	
+    // init member variables
+    self.singleShotTimer = nil;
+
     // set URL
-	[mainWebView setMainFrameURL:LH_LINGR_BASEURL];
+    [mainWebView setMainFrameURL:LH_LINGR_BASEURL];
 }
 
 
 - (void)applicationDidBecomeActive:(NSNotification *)aNotification {
-	[self cancelSingleshotTimer];
+    [self cancelSingleshotTimer];
     [self disableLogging];
 
-	// Reset unread and disable UnreadChecking
+    // Reset unread and disable UnreadChecking
     bEnableCheking = NO;
-	
+    
     // Hide Notification Badge
     NSDockTile *dockTile = [NSApp dockTile];
     [dockTile setBadgeLabel:nil];
@@ -84,18 +84,18 @@ const float LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL = 30.0;
 
 
 - (void)applicationDidResignActive:(NSNotification *)aNotification {
-	[self cancelSingleshotTimer];
+    [self cancelSingleshotTimer];
 
     // invoke oneshot timer
-	float fIntervalSec = [[NSUserDefaults standardUserDefaults] floatForKey:@"checkLogInterval"];
-	fIntervalSec = fIntervalSec == 0.0 ?  LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL : fIntervalSec;
-	self.singleShotTimer = [NSTimer scheduledTimerWithTimeInterval:fIntervalSec
+    float fIntervalSec = [[NSUserDefaults standardUserDefaults] floatForKey:@"checkLogInterval"];
+    fIntervalSec = fIntervalSec == 0.0 ?  LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL : fIntervalSec;
+    self.singleShotTimer = [NSTimer scheduledTimerWithTimeInterval:fIntervalSec
                                              target:self
                                            selector:@selector(enableLogging)
                                            userInfo:nil
                                             repeats:NO];
     [self.singleShotTimer retain];
-	[self tryToInsertInjectionCode]; //but Inject is only once 
+    [self tryToInsertInjectionCode]; //but Inject is only once 
 }
 
 
@@ -115,17 +115,17 @@ const float LH_NON_ACTIVE_DEFAULT_TIMER_INTERVAL = 30.0;
 
 
 
-- (void)				webView:(WebView *)webView 
+- (void)                webView:(WebView *)webView 
 decidePolicyForNavigationAction:(NSDictionary *)actionInformation
-						request:(NSURLRequest *)request
-						  frame:(WebFrame *)frame
-			   decisionListener:(id<WebPolicyDecisionListener>)listener
+                        request:(NSURLRequest *)request
+                          frame:(WebFrame *)frame
+               decisionListener:(id<WebPolicyDecisionListener>)listener
 {
-	NSURL *url = [request URL];
-	if( [[url scheme] isEqualToString:@"lingr"] ) {
-		[self incommingMessages];
-	} 
-	[listener use];
+    NSURL *url = [request URL];
+    if( [[url scheme] isEqualToString:@"lingr"] ) {
+        [self incommingMessages];
+    } 
+    [listener use];
 }
 
 #pragma mark -
@@ -133,28 +133,28 @@ decidePolicyForNavigationAction:(NSDictionary *)actionInformation
 
 - (void)enableLogging 
 {
-	// change message color to gray
+    // change message color to gray
     NSMutableString *script = [NSMutableString stringWithString:@"\
-		var d = document.getElementsByClassName('decorated'); \
-		for (var i = 0; i < d.length; i++) { \
-			var p = d[i].getElementsByTagName('p'); \
-			for (var j = 0; j < p.length; j++) { \
-				p[j].style.color = 'DarkGray'; \
-			} \
-		} \
-	"];
+        var d = document.getElementsByClassName('decorated'); \
+        for (var i = 0; i < d.length; i++) { \
+            var p = d[i].getElementsByTagName('p'); \
+            for (var j = 0; j < p.length; j++) { \
+                p[j].style.color = 'DarkGray'; \
+            } \
+        } \
+    "];
 
     // bgScroll
-	if (![[NSUserDefaults standardUserDefaults] boolForKey:@"bgScroll"]) {
-		[script appendString:@"lingr.ui.getActiveRoom = function() {};"];
-	}
+    if (![[NSUserDefaults standardUserDefaults] boolForKey:@"bgScroll"]) {
+        [script appendString:@"lingr.ui.getActiveRoom = function() {};"];
+    }
      
     // evaluate javascript
-	[[mainWebView windowScriptObject] evaluateWebScript:script];
-	
-	// enable counting unread messages
-	numOfUnreadMessages = 0;
-	bEnableCheking = YES;
+    [[mainWebView windowScriptObject] evaluateWebScript:script];
+
+    // enable counting unread messages
+    numOfUnreadMessages = 0;
+    bEnableCheking = YES;
 }
 
 - (void)disableLogging
@@ -167,23 +167,23 @@ decidePolicyForNavigationAction:(NSDictionary *)actionInformation
         [[mainWebView windowScriptObject] evaluateWebScript:script];
     }
 
-	// disable counting unread messages	
-	bEnableCheking = NO;
+    // disable counting unread messages    
+    bEnableCheking = NO;
 }
 
 
 -(void)tryToInsertInjectionCode
 {
     // injection for counting unread messages
-	// once for all
+    // once for all
     static BOOL bInjected =  NO;
     if (bInjected == NO) {
         NSString *script = @"\
         lingr.ui.insertMessageFunc = lingr.ui.insertMessage;\
         lingr.ui.insertMessage = function(a,b) {\
-			var result = this.insertMessageFunc(a,b);\
-			document.location.href = 'lingr://insertMessage/';\
-			return result;\
+            var result = this.insertMessageFunc(a,b);\
+            document.location.href = 'lingr://insertMessage/';\
+            return result;\
         };\
         ";
         id result = [[mainWebView windowScriptObject] evaluateWebScript:script];
@@ -192,7 +192,7 @@ decidePolicyForNavigationAction:(NSDictionary *)actionInformation
         } else {
             NSLog(@"Success injection ");
             bInjected = YES; 
-        }        
+        }
     }
 }
 
@@ -213,14 +213,14 @@ decidePolicyForNavigationAction:(NSDictionary *)actionInformation
 
 -(void)incommingMessages
 {
-	if ([NSApp isActive] || (!bEnableCheking)) {
-		return;
-	}
-	
-	numOfUnreadMessages += 1;
-	NSDockTile *dockTile = [NSApp dockTile];
-	[dockTile setBadgeLabel:[NSString stringWithFormat:@"%d", numOfUnreadMessages]];
-	[NSApp requestUserAttention:NSInformationalRequest];
+    if ([NSApp isActive] || (!bEnableCheking)) {
+        return;
+    }
+
+    numOfUnreadMessages += 1;
+    NSDockTile *dockTile = [NSApp dockTile];
+    [dockTile setBadgeLabel:[NSString stringWithFormat:@"%d", numOfUnreadMessages]];
+    [NSApp requestUserAttention:NSInformationalRequest];
 }
 
 @end
