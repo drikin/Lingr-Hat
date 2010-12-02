@@ -183,7 +183,9 @@ decidePolicyForNavigationAction:(NSDictionary *)actionInformation
         lingr.ui.insertMessage = function(a,b) {\
             var result = this.insertMessageFunc(a,b);\
             if (this.getActiveRoom() == a.room) {\
-                document.location.href = 'lingr://insertMessage/';\
+                if (a.type != 'system') {\
+                    document.location.href = 'lingr://insertMessage/';\
+                }\
             }\
             return result;\
         };\
