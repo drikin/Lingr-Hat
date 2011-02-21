@@ -2,13 +2,13 @@
 {
 	256AC3D90F4B6AC300CF3369 /* Lingr_HatAppDelegate.m */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {642, 3237}}";
+			sepNavIntBoundsRect = "{{0, 0}, {642, 3263}}";
 			sepNavSelRange = "{7123, 0}";
-			sepNavVisRange = "{6535, 589}";
+			sepNavVisRange = "{6577, 590}";
 		};
 	};
 	29B97313FDCFA39411CA2CEA /* Project object */ = {
-		activeBuildConfigurationName = Debug;
+		activeBuildConfigurationName = Release;
 		activeExecutable = 77F4F6AE13124E3800A63941 /* Lingr Hat */;
 		activeTarget = 8D1107260486CEB800E47090 /* Lingr Hat */;
 		codeSenseManager = 77F4F6C513124E4B00A63941 /* Code sense */;
@@ -43,8 +43,7 @@
 		};
 		perUserProjectItems = {
 			77F4F6BD13124E4B00A63941 /* PBXTextBookmark */ = 77F4F6BD13124E4B00A63941 /* PBXTextBookmark */;
-			77F4F6BE13124E4B00A63941 /* PBXTextBookmark */ = 77F4F6BE13124E4B00A63941 /* PBXTextBookmark */;
-			77F4F6C813124E6200A63941 /* PBXTextBookmark */ = 77F4F6C813124E6200A63941 /* PBXTextBookmark */;
+			77F4F6D71312505B00A63941 /* PBXTextBookmark */ = 77F4F6D71312505B00A63941 /* PBXTextBookmark */;
 		};
 		sourceControlManager = 77F4F6C413124E4B00A63941 /* Source Control */;
 		userBuildSettings = {
@@ -74,6 +73,8 @@
 		executableUserSymbolLevel = 0;
 		libgmallocEnabled = 0;
 		name = "Lingr Hat";
+		savedGlobals = {
+		};
 		showTypeColumn = 0;
 		sourceDirectories = (
 		);
@@ -87,16 +88,6 @@
 		rType = 0;
 		vrLen = 423;
 		vrLoc = 0;
-	};
-	77F4F6BE13124E4B00A63941 /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = 256AC3D90F4B6AC300CF3369 /* Lingr_HatAppDelegate.m */;
-		name = "Lingr_HatAppDelegate.m: 213";
-		rLen = 0;
-		rLoc = 6744;
-		rType = 0;
-		vrLen = 383;
-		vrLoc = 6535;
 	};
 	77F4F6C413124E4B00A63941 /* Source Control */ = {
 		isa = PBXSourceControlManager;
@@ -112,15 +103,15 @@
 		isa = PBXCodeSenseManager;
 		indexTemplatePath = "";
 	};
-	77F4F6C813124E6200A63941 /* PBXTextBookmark */ = {
+	77F4F6D71312505B00A63941 /* PBXTextBookmark */ = {
 		isa = PBXTextBookmark;
 		fRef = 256AC3D90F4B6AC300CF3369 /* Lingr_HatAppDelegate.m */;
 		name = "Lingr_HatAppDelegate.m: 222";
 		rLen = 0;
 		rLoc = 7123;
 		rType = 0;
-		vrLen = 589;
-		vrLoc = 6535;
+		vrLen = 590;
+		vrLoc = 6577;
 	};
 	8D1107260486CEB800E47090 /* Lingr Hat */ = {
 		activeExec = 0;
