@@ -10,19 +10,25 @@
 #import <WebKit/WebKit.h>
 
 @interface Lingr_HatAppDelegate : NSObject <NSApplicationDelegate> {
-    NSWindow *window;
-    WebView *mainWebView;
+    NSWindow		*window;
+    WebView		*mainWebView;
 @private
-    NSTimer *timer;
+    NSTimer		*singleShotTimer;
+    BOOL        bEnableCheking;
+    int         numOfUnreadMessages;
 }
 
 @property (assign) IBOutlet NSWindow *window;
 @property (assign) IBOutlet WebView *mainWebView;
 
-@property (nonatomic, assign)  NSTimer *timer;
+@property (nonatomic, assign)  NSTimer *singleShotTimer;
 
 + (void) setupDefaults;
 - (void) enableLogging;
 - (void) disableLogging;
-- (void) cancelTimer;
+- (void) cancelSingleshotTimer;
+
+- (void) tryToInsertInjectionCode;
+- (void) incommingMessages;
+
 @end
