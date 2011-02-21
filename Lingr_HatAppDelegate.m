@@ -210,7 +210,16 @@ decidePolicyForNavigationAction:(NSDictionary *)actionInformation
     }
 }
 
+- (void)webView:(WebView *)sender runJavaScriptAlertPanelWithMessage:(NSString *)message
+{
+	NSRunAlertPanel(@"JavaScript alert", message, @"OK", nil, nil);
+}
 
+- (BOOL)webView:(WebView *)sender runJavaScriptConfirmPanelWithMessage:(NSString *)message
+{
+	int choice = NSRunAlertPanel(@"JavaScript confirm", message, @"OK", @"Cancel", nil);
+	return choice == NSAlertDefaultReturn;
+}
 
 #pragma mark -
 #pragma mark Event Actions
